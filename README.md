@@ -2,6 +2,8 @@
 
 The site uses plain HTML, CSS, and JavaScript for the front end, with a small Node.js server and MongoDB for appointment data. Azerbaijani is the default language; Russian and English are also available.
 
+The public HTML, CSS, and browser JavaScript files are in `public/`. The Express server and API are in `server.js`. `vercel.json` selects the Express preset and maps the admin URLs to their static pages on Vercel.
+
 ## Connect your MongoDB Atlas cluster
 
 1. In Atlas, open your cluster and choose **Connect → Drivers → Node.js**. Copy the connection string.

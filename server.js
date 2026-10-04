@@ -19,6 +19,7 @@ const dbName = process.env.MONGODB_DB || "good_cut";
 const shopZone = process.env.SHOP_TIMEZONE || "Asia/Baku";
 const intervalMinutes = business.slotIntervalMinutes;
 const root = __dirname;
+const publicRoot = path.join(root, "public");
 const localeTags = { az: "az-AZ", ru: "ru-RU", en: "en-US" };
 const translations = {
   az: { bookedSubject: "Görüşünüz təsdiqləndi · Good Cut", booked: "Salam {name}, görüşünüz təsdiqləndi.", canceledSubject: "Görüşünüz ləğv edildi · Good Cut", canceled: "Salam {name}, görüşünüz ləğv edildi.", details: "Xidmət: {service}\nBərbər: {barber}\nTarix və saat: {date} · {time}", reason: "Qeyd: {reason}", footer: "Good Cut bərbər studiyası · {timezone}" },
@@ -447,7 +448,7 @@ const publicFiles = {
   "/admin": "admin.html", "/admin/appointments": "admin.html", "/admin/hours": "admin-hours.html", "/admin/barbers": "admin-barbers.html", "/admin/blocks": "admin-blocks.html",
   "/admin.css": "admin.css", "/admin-auth.js": "admin-auth.js", "/admin.js": "admin.js", "/admin-hours.js": "admin-hours.js", "/admin-barbers.js": "admin-barbers.js", "/admin-blocks.js": "admin-blocks.js"
 };
-for (const [route, file] of Object.entries(publicFiles)) app.get(route, (_req, res) => res.sendFile(path.join(root, file)));
+for (const [route, file] of Object.entries(publicFiles)) app.get(route, (_req, res) => res.sendFile(path.join(publicRoot, file)));
 app.use((_req, res) => res.status(404).json({ error: "Not found." }));
 app.use((error, _req, res, _next) => {
   console.error(error);

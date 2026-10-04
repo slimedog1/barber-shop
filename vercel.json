@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "express",
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/admin/appointments", "destination": "/admin.html" },
+    { "source": "/admin/hours", "destination": "/admin-hours.html" },
+    { "source": "/admin/barbers", "destination": "/admin-barbers.html" },
+    { "source": "/admin/blocks", "destination": "/admin-blocks.html" }
+  ]
+}
