@@ -30,6 +30,7 @@ const translations = {
 const client = new MongoClient(mongoUrl, { serverSelectionTimeoutMS: 5000 });
 let db;
 let mailer;
+let appReady;
 
 function localDateTime(date, time, zone = shopZone) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return null;
@@ -128,6 +129,9 @@ app.use(helmet({
   }
 }));
 app.use(express.json({ limit: "20kb" }));
+app.use((_req, _res, next) => {
+  appReady.then(() => next(), next);
+});
 app.use(session({
   name: "goodcut.sid",
   secret: process.env.SESSION_SECRET || "missing-secret-set-this-in-env-before-starting",
@@ -456,7 +460,7 @@ app.use((error, _req, res, _next) => {
   res.status(500).json({ error: "Something went wrong. Please try again." });
 });
 
-async function start() {
+async function initialize() {
   if (!process.env.MONGODB_URI || process.env.MONGODB_URI.includes("paste-your-mongodb")) throw new Error("Set MONGODB_URI in your .env file to your MongoDB Atlas connection string.");
   if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) throw new Error("Set ADMIN_USERNAME and ADMIN_PASSWORD in your .env file before starting.");
   if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32 || process.env.SESSION_SECRET.includes("replace-with")) throw new Error("Set SESSION_SECRET in .env to a random value at least 32 characters long.");
@@ -468,11 +472,19 @@ async function start() {
   } else {
     console.warn("Email is not configured. Bookings will save, but notification emails will not be sent.");
   }
-  app.listen(port, "0.0.0.0", () => console.log(`Good Cut is running at http://localhost:${port}`));
 }
 
-start().catch((error) => {
-  console.error(`Could not start the local app: ${error.message}`);
-  if (error.name === "MongoServerSelectionError") console.error("Check your Atlas IP access list, database user, password, and connection string.");
-  process.exitCode = 1;
-});
+appReady = initialize();
+appReady.catch(() => {});
+
+if (require.main === module) {
+  appReady.then(() => {
+    app.listen(port, "0.0.0.0", () => console.log(`Good Cut is running at http://localhost:${port}`));
+  }).catch((error) => {
+    console.error(`Could not start the local app: ${error.message}`);
+    if (error.name === "MongoServerSelectionError") console.error("Check your Atlas IP access list, database user, password, and connection string.");
+    process.exitCode = 1;
+  });
+}
+
+module.exports = app;
