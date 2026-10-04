@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#191a17">
+  <meta name="description" content="Good Cut bərbər studiyasına xoş gəlmisiniz.">
+  <title>Good Cut — Bərbər studiyası</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="site look-atelier">
+    <header class="nav">
+      <a class="brand" href="#top"><span class="brand-mark">✂</span><span>GOOD CUT<small>BARBER STUDIO</small></span></a>
+      <div class="language-switch" aria-label="Select language">
+        <button class="active" type="button" data-language="az" aria-pressed="true">AZ</button>
+        <button type="button" data-language="ru" aria-pressed="false">RU</button>
+        <button type="button" data-language="en" aria-pressed="false">EN</button>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false"><span class="theme-icon" aria-hidden="true">☼</span><span id="theme-label">İşıqlı görünüş</span></button>
+      <button class="menu-toggle" type="button" aria-label="Menyunu aç">☰</button>
+      <nav class="nav-links">
+        <a href="#services" data-i18n="navServices">Xidmətlər</a><a href="#people" data-i18n="navBarbers">Bərbərlərimiz</a><a href="#visit" data-i18n="navVisit">Ünvan</a>
+        <button class="nav-book" type="button" data-open-booking><span data-i18n="book">Vaxt təyin et</span> ↗</button>
+      </nav>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="hero-copy"><div class="eyebrow"><i></i><span data-i18n="eyebrow">MƏHƏLLƏNİZİN YENİ NƏSİL BƏRBƏR SALONU</span></div>
+        <h1 data-i18n="hero">Saçınız gözəl.<br><em>Əhvalınız daha da.</em></h1>
+        <p class="hero-text" data-i18n="heroText">Səliqəli saç kəsimi, xoş söhbət və özünüzə ayırdığınız bir saat. Necəsinizsə, elə gəlin. Daha yaxşı hiss edərək ayrılın.</p>
+        <div class="hero-actions"><button class="button-primary" type="button" data-open-booking><span data-i18n="bookAppointment">Görüş təyin edin</span> →</button><a class="text-link" href="#services"><span data-i18n="explore">Xidmətlərə baxın</span> ↓</a></div>
+        <div class="hero-meta"><span>◷ <span data-i18n="openToday">BU GÜN AÇIQDIR · 09:00—19:00</span></span><i></i><span>⌖ <span data-i18n="yourCity">ŞƏHƏRİNİZ, MƏHƏLLƏNİZ</span></span></div>
+      </div>
+      <div class="hero-photo"><div class="hero-img"></div><div class="photo-tag"><span data-i18n="photoCaption">XOŞ İNSANLAR. PEŞƏKAR İŞ.</span><span>EST. 2024</span></div><div class="hero-stamp"><span>✳</span><small data-i18n="takeSeat">Əyləşin<br>bir az dincəlin</small></div></div>
+      <span class="hero-vertical" data-i18n="since">ÖZÜNÜZ KİMİ OLACAĞINIZ MƏKAN — 2024-DƏN</span>
+    </section>
+
+    <section class="intro-strip"><p data-i18n="intro">Sadəcə saç kəsimi deyil.<br><em>Özünüzə xoş bir saat.</em></p><div class="strip-right"><div class="stars">★★★★★ <span>4.9 / 5</span></div><span data-i18n="neighbors">280-DƏN ÇOX MƏMNUN MÜŞTƏRİ</span></div></section>
+    <section class="services section-pad" id="services"><div class="section-heading"><div><div class="eyebrow"><i></i><span data-i18n="servicesEyebrow">YAXŞI XİDMƏTLƏR</span></div><h2 data-i18n="servicesTitle">Sizə uyğun<br><em>olanı seçin.</em></h2></div><p data-i18n="servicesIntro">Yaxşı iş vaxt tələb edir. Rahat əyləşin, istəyinizi danışın — qalanını biz həll edərik.</p></div><div class="service-list" id="service-list"></div><div class="services-foot"><span data-i18n="consult">Hər görüşə qısa məsləhətləşmə və ikram daxildir.</span><button class="text-link" type="button" data-open-booking><span data-i18n="bookService">Xidmət sifariş edin</span> →</button></div></section>
+    <section class="barbers section-pad" id="people"><div class="section-heading"><div><div class="eyebrow"><i></i><span data-i18n="teamEyebrow">USTALARIMIZLA TANIŞ OLUN</span></div><h2 data-i18n="teamTitle">Xoş insanlar.<br><em>Etibarlı əllər.</em></h2></div><p data-i18n="teamIntro">Söhbətcil, işində dəqiq. Ustalarımızla tanış olun və özünüzə uyğununu seçin.</p></div><div class="barber-grid" id="barber-grid"></div></section>
+    <section class="quote-band"><span class="quote-star">✳</span><blockquote data-i18n="quote">“İllərdir etdirdiyim ən yaxşı saç kəsimidir.<br>Qəhvələri də əladır.”</blockquote><div class="quote-byline"><div class="stars">★★★★★</div><span data-i18n="regular">— TAYLOR R. · 2022-DƏN DAİMİ MÜŞTƏRİ</span></div></section>
+    <section class="gallery section-pad"><div class="gallery-title"><div><div class="eyebrow"><i></i><span data-i18n="galleryEyebrow">SALONUMUZDAN GÖRÜNTÜLƏR</span></div><h2 data-i18n="galleryTitle">Good Cut-da<br><em>gözəl günlər.</em></h2></div><a href="#visit" class="text-link"><span data-i18n="comeSee">Özünüz gəlib görün</span> →</a></div><div class="gallery-grid" id="gallery-grid"></div></section>
+    <section class="visit" id="visit"><div class="visit-left"><div class="eyebrow"><i></i><span data-i18n="visitEyebrow">GƏLİN, RAHAT ƏYLƏŞİN</span></div><h2 data-i18n="visitTitle">Sizin üçün<br><em>yerimiz var.</em></h2><p data-i18n="visitText">Boş yer olduqda növbəsiz də qəbul edirik. Görüş təyin etsəniz, sizi gözləyəcəyik.</p><button class="button-primary" type="button" data-open-booking><span data-i18n="findTime">Vaxt seçin</span> →</button></div><div class="visit-details"><div><span class="detail-icon">⌖</span><span><small data-i18n="findUs">ÜNVAN</small><b data-i18n="address">123 Placeholder küçəsi<br>Məhəlləniz, şəhər</b></span></div><div><span class="detail-icon">◷</span><span><small data-i18n="comeIn">İŞ SAATLARI</small><b data-i18n="hours">Ç.a.—Cümə · 09:00—19:00<br>Şənbə · 10:00—17:00</b></span></div><div class="map-card"><div class="map-grid"></div><span>⌖</span><span data-i18n="map">GOOD CUT · ŞƏHƏRİNİZ</span></div></div></section>
+    <footer class="footer"><a class="brand" href="#top"><span class="brand-mark">✂</span><span>GOOD CUT<small>BARBER STUDIO</small></span></a><span data-i18n="footerLine">GÖZƏL KƏSİM. XOŞ İNSANLAR. YAXŞI ƏHVAL.</span><span>© 2024 GOOD CUT BARBER STUDIO</span></footer>
+  </main>
+
+  <div class="modal-backdrop" id="booking-modal" hidden><section class="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-title"><button class="modal-close" type="button" data-close-booking aria-label="Formanı bağla">×</button><div id="booking-form-wrap"><div class="eyebrow"><i></i><span data-i18n="bookingEyebrow">BUYURUN, GƏLİN</span></div><h2 id="booking-title" data-i18n="bookingTitle">Gəlin,<br><em>özünüzə vaxt ayırın.</em></h2><p class="modal-intro" data-i18n="bookingIntro">Nə istədiyinizi yazın. Görüş vaxtını sizinlə dəqiqləşdirəcəyik.</p><form id="booking-form"><label><span data-i18n="name">Adınız</span><input name="name" required autocomplete="name" data-placeholder="namePlaceholder" placeholder="Sizə necə müraciət edək?"></label><label><span data-i18n="contact">E-poçt ünvanı</span><input type="email" name="email" required autocomplete="email" data-placeholder="contactPlaceholder" placeholder="name@example.com"></label><label><span data-calendar="barberLabel">Bərbər seçin</span><select name="barberId" id="booking-barber" required></select></label><label><span data-i18n="service">Xidmət</span><select name="serviceId" id="booking-service" required></select></label><div class="calendar-box"><div class="calendar-heading"><strong data-calendar="calendarTitle">Görüş günü</strong><span data-calendar="availabilityNote">Mövcud vaxtlar</span></div><div class="calendar-month"><button type="button" id="calendar-prev" aria-label="Previous month">‹</button><strong id="calendar-month-label"></strong><button type="button" id="calendar-next" aria-label="Next month">›</button></div><div class="calendar-weekdays" id="calendar-weekdays"></div><div class="calendar-days" id="calendar-days"></div><p class="calendar-hint" id="calendar-hint" data-calendar="chooseBarberFirst">Boş vaxtları görmək üçün əvvəlcə bərbər seçin.</p><input type="hidden" name="date" id="selected-date"><input type="hidden" name="time" id="selected-time"><div class="slots-panel" id="slots-panel" hidden><div class="slots-title" id="slots-title"></div><div class="time-slots" id="time-slots"></div></div><p class="calendar-error" id="calendar-error" role="alert" hidden></p></div><label><span><span data-i18n="note">Əlavə qeyd</span> <small class="optional" data-i18n="optional">İSTƏYƏ BAĞLI</small></span><textarea name="note" rows="2" data-placeholder="notePlaceholder" placeholder="Bərbəriniz üçün qeyd"></textarea></label><button class="button-primary form-submit" type="submit"><span data-i18n="request">Görüş üçün müraciət edin</span> →</button><small class="form-note" data-i18n="demo">Email ilə bildiriş göndərilir.</small></form></div><div id="booking-success" hidden><div class="success-icon">✳</div><div class="eyebrow" data-i18n="successEyebrow">ƏLA!</div><h2 id="booking-success-title" data-i18n="successTitle">Görüşünüz<br><em>təsdiqləndi.</em></h2><p id="booking-success-message" data-i18n="successText">E-poçt ünvanınıza təsdiq göndərildi.</p><button class="button-primary" type="button" data-close-booking><span data-i18n="back">Salona qayıt</span> →</button></div></section></div>
+  <script src="script.js" defer></script>
+</body>
+</html>

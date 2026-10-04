@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="az">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#191a17">
+  <title>Görüşlər · Good Cut</title><link rel="stylesheet" href="/admin.css">
+  <script src="/admin-auth.js" defer></script><script src="/admin.js" defer></script>
+</head>
+<body>
+  <main class="admin-shell">
+    <header class="admin-header"><a href="/" class="brand">GOOD CUT <span>ADMİN</span></a><a href="/" class="back-link">← Sayta bax</a></header>
+    <section id="login-panel" class="panel login-panel"><p class="eyebrow">ADMİN GİRİŞİ</p><h1>Xoş gəlmisiniz.</h1><p class="muted">Görüşləri idarə etmək üçün daxil olun.</p><form id="login-form"><label>İstifadəçi adı<input name="username" autocomplete="username" required></label><label>Şifrə<input name="password" type="password" autocomplete="current-password" required></label><button class="button" type="submit">Daxil ol <span>→</span></button><p id="login-message" class="message" role="alert" hidden></p></form></section>
+    <section id="dashboard" hidden>
+      <div class="dashboard-heading"><div><p class="eyebrow">GOOD CUT · ADMİN</p><h1>Görüşlər</h1><p class="muted">Gündəlik görüş cədvəlinə baxın və onu idarə edin.</p></div><button id="logout" class="button button-quiet" type="button">Çıxış</button></div>
+      <nav id="admin-nav" class="dashboard-nav" aria-label="Admin paneli" hidden><a class="nav-tab active" href="/admin/appointments">Görüşlər</a><a class="nav-tab" href="/admin/hours">İş saatları</a><a class="nav-tab" href="/admin/barbers">Bərbərlər</a><a class="nav-tab" href="/admin/blocks">Vaxt blokları</a></nav>
+      <section class="panel appointments-panel"><div class="day-toolbar"><div class="day-change"><button id="date-prev" class="icon-button" type="button" aria-label="Əvvəlki gün">‹</button><input id="appointment-date" type="date" aria-label="Görüş tarixi"><button id="date-next" class="icon-button" type="button" aria-label="Növbəti gün">›</button><button id="date-today" class="button button-quiet" type="button">Bu gün</button></div><select id="appointment-filter" aria-label="Görüş statusu"><option value="confirmed">Təsdiqlənib</option><option value="cancelled">Ləğv olunub</option><option value="all">Bütün statuslar</option></select></div>
+        <div class="section-heading day-summary"><div><h2 id="selected-day-title">Görüşlər</h2><p id="appointment-count" class="muted">Yüklənir…</p></div></div><div id="appointments-list" class="appointments-list"><p class="muted">Görüşlər yüklənir…</p></div></section>
+      <p id="global-message" class="global-message" role="alert" hidden></p>
+    </section>
+  </main>
+</body>
+</html>
