@@ -1,6 +1,6 @@
 # Good Cut — barber booking site
 
-The site uses plain HTML, CSS, and JavaScript for the front end, with a small Node.js server and MongoDB for appointment data. Azerbaijani is the default language; Russian and English are also available.
+The site uses plain HTML, CSS, and JavaScript for the front end, with a small Node.js server and MongoDB for appointment data. The website and admin pages are in Azerbaijani.
 
 The public HTML, CSS, and browser JavaScript files are in `public/`. The Express server and API are in `server.js`. `vercel.json` selects the Express preset and maps the admin URLs to their static pages on Vercel.
 
@@ -16,12 +16,22 @@ The public HTML, CSS, and browser JavaScript files are in `public/`. The Express
 
 Atlas requires both a database user and an allowed IP address before the app can connect. Atlas's **Drivers** connection string is intended for an application; if your password contains reserved URL characters, encode them before putting the URI in `.env`.
 
+
+## Cloudinary image uploads
+
+The admin photo pickers upload images directly from a phone or computer to Cloudinary using a short-lived server-generated signature. The Cloudinary API secret stays in server environment variables and is never sent to the browser.
+
+1. Create a Cloudinary account and copy the cloud name, API key, and API secret from **Console Settings → API Keys**.
+2. Set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` in the local `.env` file for local use.
+3. Add the same three variables to the Vercel project's Environment Variables, then redeploy. Keep the API secret private.
+4. Open `/admin/barbers` to replace profile photos, or `/admin/content` to replace the homepage and gallery photos. The picker supports images up to 10 MB.
+
 ## Email notifications (optional for now)
 
 Appointments are saved and confirmed even while SMTP settings are blank. Add your email provider's SMTP host, port, username, password, and sender address to `.env` to send booking and cancellation notices.
 
 ## Editable shop placeholders
 
-Placeholder services, prices, durations, and default barber data are defined in `config/business.js`. Staff can update weekly opening hours and barber names, roles, and active status from the admin pages; those changes are saved in MongoDB and remain after a server restart. Default catalog data is only inserted into an empty database. Barber photo editing is not part of the admin workflow yet.
+Placeholder services, prices, durations, and default barber data are defined in `config/business.js`. Staff can update weekly opening hours, barber profiles and photos, services and prices per barber, and the Azerbaijani About section and site photos from the admin pages. Changes are saved in MongoDB. The initial services are copied to each barber the first time the updated app starts; later edits are preserved.
 
-The booking calendar checks live appointments and staff blocks. Staff share the username/password in `.env`. The admin pages are `/admin/appointments`, `/admin/hours`, `/admin/barbers`, and `/admin/blocks`; `/admin` opens appointments by default. Archived barbers are removed from the public roster and new booking choices while their records and past appointments remain in MongoDB. Booking is confirmed immediately when the slot is available.
+The booking calendar checks live appointments and staff blocks. Staff share the username/password in `.env`. The admin pages are `/admin/appointments`, `/admin/services`, `/admin/barbers`, `/admin/hours`, `/admin/blocks`, and `/admin/content`; `/admin` opens appointments by default. Archived barbers are removed from the public roster and new booking choices while their records and past appointments remain in MongoDB. Booking is confirmed immediately when the slot is available.

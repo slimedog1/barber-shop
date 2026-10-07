@@ -6,6 +6,8 @@
     { "source": "/admin/appointments", "destination": "/admin.html" },
     { "source": "/admin/hours", "destination": "/admin-hours.html" },
     { "source": "/admin/barbers", "destination": "/admin-barbers.html" },
-    { "source": "/admin/blocks", "destination": "/admin-blocks.html" }
+    { "source": "/admin/blocks", "destination": "/admin-blocks.html" },
+    { "source": "/admin/services", "destination": "/admin-services.html" },
+    { "source": "/admin/content", "destination": "/admin-content.html" }
   ]
 }

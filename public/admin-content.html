@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="az">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#191a17"><title>Sayt məzmunu · Good Cut</title><link rel="stylesheet" href="/admin.css"><script src="/admin-auth.js" defer></script><script src="/admin-content.js" defer></script></head>
+<body><main class="admin-shell">
+  <header class="admin-header"><a href="/" class="brand">GOOD CUT <span>ADMİN</span></a><a href="/" class="back-link">← Sayta bax</a></header>
+  <section id="login-panel" class="panel login-panel"><p class="eyebrow">ADMİN GİRİŞİ</p><h1>Xoş gəlmisiniz.</h1><p class="muted">Sayt məzmununu idarə etmək üçün daxil olun.</p><form id="login-form"><label>İstifadəçi adı<input name="username" autocomplete="username" required></label><label>Şifrə<input name="password" type="password" autocomplete="current-password" required></label><button class="button" type="submit">Daxil ol <span>→</span></button><p id="login-message" class="message" role="alert" hidden></p></form></section>
+  <section id="dashboard" hidden><div class="dashboard-heading"><div><p class="eyebrow">GOOD CUT · ADMİN</p><h1>Sayt məzmunu</h1><p class="muted">Şəkilləri və əsas səhifədəki “Haqqımızda” bölməsini yeniləyin.</p></div><button id="logout" class="button button-quiet" type="button">Çıxış</button></div>
+    <nav id="admin-nav" class="dashboard-nav" aria-label="Admin paneli" hidden></nav>
+    <section class="panel settings-panel"><div class="section-heading"><div><h2>Əsas səhifənin şəkilləri</h2><p class="muted">Şəkil telefonun qalereyasından və ya kompüterdən seçilir. JPG, PNG və WebP, maksimum 10 MB.</p></div></div><div id="site-photos" class="site-photo-grid"></div></section>
+    <section class="panel settings-panel"><div class="section-heading"><div><h2>Haqqımızda</h2><p class="muted">Bu mətn əsas səhifədə şəkil qalereyasından əvvəl görünür.</p></div></div><form id="about-form" class="about-form"><label>Kiçik başlıq<input name="kicker" required maxlength="80"></label><label>Bölmənin başlığı<input name="title" required maxlength="120"></label><label>Birinci abzas<textarea name="paragraph1" required maxlength="500" rows="4"></textarea></label><label>İkinci abzas<textarea name="paragraph2" required maxlength="500" rows="4"></textarea></label><label>Yekun vurğu<input name="note" required maxlength="180"></label><p id="about-message" class="message" role="alert" hidden></p><button class="button" type="submit">Mətni yadda saxla <span>→</span></button></form></section>
+    <p id="global-message" class="global-message" role="alert" hidden></p>
+  </section>
+</main></body></html>

@@ -14,11 +14,7 @@ const errorTranslations = {
   "Provide opening hours for each day.": "Hər gün üçün iş saatlarını göstərin.",
   "Each open day needs a valid opening and closing time.": "Açıq günlər üçün düzgün açılış və bağlanış saatı daxil edin.",
   "Keep at least one day open.": "Ən azı bir iş günü açıq qalmalıdır.",
-  "Provide a name and role in Azerbaijani, Russian, and English.": "Bərbərin adını və vəzifəsini Azərbaycan, rus və ingilis dillərində daxil edin.",
-  "Provide a name in Azerbaijani, Russian, and English.": "Bərbərin adını Azərbaycan, rus və ingilis dillərində daxil edin.",
-  "Provide a role in Azerbaijani, Russian, and English.": "Bərbərin vəzifəsini Azərbaycan, rus və ingilis dillərində daxil edin.",
   "Enter a valid barber name.": "Düzgün bərbər adı daxil edin.",
-  "A barber with a similar English name already exists.": "Bu ingilisdilli adda bərbər artıq mövcuddur.",
   "Invalid barber status.": "Bərbərin statusu yanlışdır.",
   "Keep at least one active barber for online bookings.": "Onlayn görüşlər üçün ən azı bir bərbər aktiv qalmalıdır.",
   "Barber not found.": "Bərbər tapılmadı.",
@@ -35,7 +31,7 @@ const errorTranslations = {
 };
 
 function translateAdminError(message) {
-  return errorTranslations[message] || "Xəta baş verdi. Yenidən cəhd edin.";
+  return errorTranslations[message] || message || "Xəta baş verdi. Yenidən cəhd edin.";
 }
 
 async function adminApi(url, options = {}) {
@@ -48,6 +44,29 @@ async function adminApi(url, options = {}) {
   const data = response.status === 204 ? {} : await response.json().catch(() => ({}));
   if (!response.ok) throw Object.assign(new Error(translateAdminError(data.error || "")), { status: response.status });
   return data;
+}
+
+async function adminUploadImage(file, type, key) {
+  if (!file || !file.type.startsWith("image/")) throw new Error("Şəkil faylı seçin.");
+  if (file.size > 10 * 1024 * 1024) throw new Error("Şəkil 10 MB-dan kiçik olmalıdır.");
+  const signature = await adminApi("/api/admin/images/signature", { method: "POST", body: JSON.stringify({ type, key }) });
+  const form = new FormData();
+  form.append("file", file);
+  form.append("api_key", signature.apiKey);
+  form.append("timestamp", signature.timestamp);
+  form.append("public_id", signature.publicId);
+  form.append("overwrite", "true");
+  form.append("signature", signature.signature);
+  let response;
+  try {
+    response = await fetch(`https://api.cloudinary.com/v1_1/${encodeURIComponent(signature.cloudName)}/image/upload`, { method: "POST", body: form });
+  } catch {
+    throw new Error("Cloudinary ilə əlaqə yaratmaq mümkün olmadı.");
+  }
+  const uploaded = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error("Şəkli yükləmək mümkün olmadı. Faylın formatını yoxlayın.");
+  await adminApi("/api/admin/images", { method: "POST", body: JSON.stringify({ type, key, publicId: uploaded.public_id, url: uploaded.secure_url }) });
+  return uploaded.secure_url;
 }
 
 function adminEscape(value = "") {
@@ -74,13 +93,17 @@ function setAdminAuthenticated(authenticated) {
   loginPanel.hidden = authenticated;
   dashboard.hidden = !authenticated;
   if (authenticated) {
-    document.querySelector("#admin-nav").hidden = false;
+    const currentPath = window.location.pathname.replace(/\/$/, "") || "/admin/appointments";
+    const links = [["/admin/appointments", "Görüşlər"], ["/admin/services", "Xidmətlər"], ["/admin/barbers", "Bərbərlər"], ["/admin/hours", "İş saatları"], ["/admin/blocks", "Vaxt blokları"], ["/admin/content", "Sayt məzmunu"]];
+    const nav = document.querySelector("#admin-nav");
+    nav.innerHTML = links.map(([url, label]) => `<a class="nav-tab${currentPath === url || (url === "/admin/appointments" && currentPath === "/admin") ? " active" : ""}" href="${url}">${label}</a>`).join("");
+    nav.hidden = false;
     globalMessage.hidden = true;
     document.dispatchEvent(new CustomEvent("admin:ready"));
   }
 }
 
-window.Admin = { api: adminApi, escapeHtml: adminEscape, showError: adminShowError };
+window.Admin = { api: adminApi, escapeHtml: adminEscape, uploadImage: adminUploadImage, showError: adminShowError };
 window.Admin.showNotice = (message) => {
   globalMessage.textContent = message;
   globalMessage.classList.add("success-banner");

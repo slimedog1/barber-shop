@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="az">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#191a17"><title>Xidmətlər · Good Cut</title><link rel="stylesheet" href="/admin.css"><script src="/admin-auth.js" defer></script><script src="/admin-services.js" defer></script></head>
+<body><main class="admin-shell">
+  <header class="admin-header"><a href="/" class="brand">GOOD CUT <span>ADMİN</span></a><a href="/" class="back-link">← Sayta bax</a></header>
+  <section id="login-panel" class="panel login-panel"><p class="eyebrow">ADMİN GİRİŞİ</p><h1>Xoş gəlmisiniz.</h1><p class="muted">Xidmətləri idarə etmək üçün daxil olun.</p><form id="login-form"><label>İstifadəçi adı<input name="username" autocomplete="username" required></label><label>Şifrə<input name="password" type="password" autocomplete="current-password" required></label><button class="button" type="submit">Daxil ol <span>→</span></button><p id="login-message" class="message" role="alert" hidden></p></form></section>
+  <section id="dashboard" hidden><div class="dashboard-heading"><div><p class="eyebrow">GOOD CUT · ADMİN</p><h1>Xidmətlər</h1><p class="muted">Hər bərbər üçün xidmət, qiymət və müddəti ayrıca təyin edin.</p></div><button id="logout" class="button button-quiet" type="button">Çıxış</button></div>
+    <nav id="admin-nav" class="dashboard-nav" aria-label="Admin paneli" hidden></nav>
+    <section class="panel settings-panel"><label class="service-filter">Bərbər<select id="service-barber"></select></label><div id="services-list" class="admin-services-list"></div></section>
+    <section class="panel settings-panel"><div class="section-heading"><div><h2>Yeni xidmət</h2><p class="muted">Yeni xidmət seçilmiş bərbərin səhifəsində və görüş formasında görünəcək.</p></div></div><form id="service-form" class="service-form"><label>Xidmətin adı<input name="name" required maxlength="100"></label><label>Təsvir<textarea name="description" maxlength="240" rows="2"></textarea></label><div class="service-number-fields"><label>Qiymət (₼)<input name="price" type="number" min="0.01" max="10000" step="0.01" required></label><label>Müddət (dəqiqə)<input name="durationMinutes" type="number" min="10" max="240" step="5" required></label></div><p id="service-message" class="message" role="alert" hidden></p><button class="button" type="submit">Xidmət əlavə et <span>＋</span></button></form></section><p id="global-message" class="global-message" role="alert" hidden></p>
+  </section>
+</main></body></html>

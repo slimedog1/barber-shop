@@ -20,11 +20,18 @@ const shopZone = process.env.SHOP_TIMEZONE || "Asia/Baku";
 const intervalMinutes = business.slotIntervalMinutes;
 const root = __dirname;
 const publicRoot = path.join(root, "public");
-const localeTags = { az: "az-AZ", ru: "ru-RU", en: "en-US" };
-const translations = {
-  az: { bookedSubject: "Görüşünüz təsdiqləndi · Good Cut", booked: "Salam {name}, görüşünüz təsdiqləndi.", canceledSubject: "Görüşünüz ləğv edildi · Good Cut", canceled: "Salam {name}, görüşünüz ləğv edildi.", details: "Xidmət: {service}\nBərbər: {barber}\nTarix və saat: {date} · {time}", reason: "Qeyd: {reason}", footer: "Good Cut bərbər studiyası · {timezone}" },
-  ru: { bookedSubject: "Запись подтверждена · Good Cut", booked: "Здравствуйте, {name}, ваша запись подтверждена.", canceledSubject: "Запись отменена · Good Cut", canceled: "Здравствуйте, {name}, ваша запись отменена.", details: "Услуга: {service}\nБарбер: {barber}\nДата и время: {date} · {time}", reason: "Комментарий: {reason}", footer: "Барбершоп Good Cut · {timezone}" },
-  en: { bookedSubject: "Appointment confirmed · Good Cut", booked: "Hi {name}, your appointment is confirmed.", canceledSubject: "Appointment canceled · Good Cut", canceled: "Hi {name}, your appointment has been canceled.", details: "Service: {service}\nBarber: {barber}\nDate and time: {date} · {time}", reason: "Note: {reason}", footer: "Good Cut Barber Studio · {timezone}" }
+const defaultSiteContent = {
+  about: {
+    kicker: "BİZİMLƏ TANIŞ OLUN",
+    title: "Saç kəsimindən daha çoxu.",
+    paragraph1: "Good Cut — özünüzə vaxt ayıra, rahat söhbət edə və güzgüdə özünüzü daha yaxşı hiss edə biləcəyiniz bir məkandır.",
+    paragraph2: "Hər qonağı diqqətlə dinləyir, ona uyğun üslub seçir və işi səliqə ilə tamamlayırıq. Qapıdan necə gəlirsinizsə, elə də buyurun.",
+    note: "Səmimi münasibət. Diqqətli iş. Rahat mühit."
+  },
+  photos: {
+    hero: "https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1300&q=90",
+    gallery: ["https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&w=1000&q=85", "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1000&q=85", "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1000&q=85", "https://images.unsplash.com/photo-1622287162716-f311baa1a2b8?auto=format&fit=crop&w=1000&q=85"]
+  }
 };
 
 const client = new MongoClient(mongoUrl, { serverSelectionTimeoutMS: 5000 });
@@ -62,19 +69,47 @@ function safeEquals(left, right) {
   return crypto.timingSafeEqual(a, b);
 }
 
-function localLabel(date, time, locale) {
+function localLabel(date) {
   const local = DateTime.fromJSDate(date, { zone: "utc" }).setZone(shopZone);
-  const dateLabel = new Intl.DateTimeFormat(localeTags[locale] || localeTags.az, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: shopZone }).format(local.toJSDate());
+  const dateLabel = new Intl.DateTimeFormat("az-AZ", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: shopZone }).format(local.toJSDate());
   return { date: dateLabel, time: local.toFormat("HH:mm") };
 }
 
-function serviceName(service, locale) { return service?.name?.[locale] || service?.name?.az || ""; }
-function barberName(barber, locale) { return barber?.name?.[locale] || barber?.name?.az || ""; }
+function serviceName(service) { return typeof service?.name === "string" ? service.name : service?.name?.az || ""; }
+function barberName(barber) { return typeof barber?.name === "string" ? barber.name : barber?.name?.az || ""; }
 
 async function seedBusiness() {
-  for (const barber of barbers) await db.collection("barbers").updateOne({ _id: barber._id }, { $setOnInsert: barber }, { upsert: true });
-  for (const service of services) await db.collection("services").updateOne({ _id: service._id }, { $setOnInsert: service }, { upsert: true });
+  for (const barber of barbers) {
+    await db.collection("barbers").updateOne({ _id: barber._id }, { $setOnInsert: barber }, { upsert: true });
+    const current = await db.collection("barbers").findOne({ _id: barber._id });
+    if (current && typeof current.name !== "string") {
+      await db.collection("barbers").updateOne({ _id: barber._id }, { $set: { name: barber.name, role: barber.role, photoUrl: current.photoUrl || `https://images.unsplash.com/${current.photo || barber.photo}?auto=format&fit=crop&w=900&q=85` }, $unset: { photo: "" } });
+    } else if (current && !current.photoUrl) {
+      await db.collection("barbers").updateOne({ _id: barber._id }, { $set: { photoUrl: `https://images.unsplash.com/${current.photo || barber.photo}?auto=format&fit=crop&w=900&q=85` }, $unset: { photo: "" } });
+    }
+  }
+  for (const current of await db.collection("barbers").find({}).toArray()) {
+    const name = typeof current.name === "string" ? current.name : current.name?.az || "Bərbər";
+    const role = typeof current.role === "string" ? current.role : current.role?.az || "Bərbər";
+    const photoUrl = current.photoUrl || (current.photo ? `https://images.unsplash.com/${current.photo}?auto=format&fit=crop&w=900&q=85` : barbers[0].photo ? `https://images.unsplash.com/${barbers[0].photo}?auto=format&fit=crop&w=900&q=85` : "");
+    if (name !== current.name || role !== current.role || photoUrl !== current.photoUrl || current.photo) {
+      await db.collection("barbers").updateOne({ _id: current._id }, { $set: { name, role, photoUrl }, $unset: { photo: "" } });
+    }
+  }
+  for (const service of services) {
+    await db.collection("services").updateOne({ _id: service._id }, { $setOnInsert: { ...service, active: false } }, { upsert: true });
+    const legacy = await db.collection("services").findOne({ _id: service._id });
+    if (legacy && (typeof legacy.name !== "string" || legacy.active !== false)) {
+      await db.collection("services").updateOne({ _id: service._id }, { $set: { name: service.name, description: service.description, active: false } });
+    }
+  }
+  const storedBarbers = await db.collection("barbers").find({}).toArray();
+  for (const barber of storedBarbers) for (const service of services) {
+    const barberService = { ...service, _id: `${service._id}-${barber._id}`, barberId: barber._id, active: true };
+    await db.collection("services").updateOne({ _id: barberService._id }, { $setOnInsert: barberService }, { upsert: true });
+  }
   await db.collection("settings").updateOne({ _id: business._id }, { $setOnInsert: { ...business, timezone: shopZone } }, { upsert: true });
+  await db.collection("settings").updateOne({ _id: business._id, siteContent: { $exists: false } }, { $set: { siteContent: defaultSiteContent } });
   await db.collection("appointments").createIndex({ barberId: 1, occupiedSlots: 1 }, { unique: true, name: "unique_barber_occupied_slots" });
   await db.collection("appointments").createIndex({ status: 1, startAt: 1 });
   await db.collection("blocks").createIndex({ barberId: 1, startAt: 1, endAt: 1 });
@@ -88,14 +123,13 @@ function sendMail(to, subject, text) {
 }
 
 async function sendAppointmentMail(appointment, canceled = false) {
-  const language = translations[appointment.language] ? appointment.language : "az";
-  const t = translations[language];
+  const t = { bookedSubject: "Görüşünüz təsdiqləndi · Good Cut", booked: "Salam {name}, görüşünüz təsdiqləndi.", canceledSubject: "Görüşünüz ləğv edildi · Good Cut", canceled: "Salam {name}, görüşünüz ləğv edildi.", details: "Xidmət: {service}\nBərbər: {barber}\nTarix və saat: {date} · {time}", reason: "Qeyd: {reason}", footer: "Good Cut bərbər studiyası · {timezone}" };
   const service = await db.collection("services").findOne({ _id: appointment.serviceId });
   const barber = await db.collection("barbers").findOne({ _id: appointment.barberId });
-  const local = localLabel(appointment.startAt, appointment.time, language);
+  const local = localLabel(appointment.startAt);
   const interpolate = (line) => line.replace("{name}", appointment.customerName)
-    .replace("{service}", serviceName(service, language))
-    .replace("{barber}", barberName(barber, language))
+    .replace("{service}", serviceName(service))
+    .replace("{barber}", barberName(barber))
     .replace("{date}", local.date)
     .replace("{time}", local.time)
     .replace("{reason}", appointment.cancellationReason || "")
@@ -125,8 +159,8 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"], scriptSrc: ["'self'"], styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"], imgSrc: ["'self'", "https://images.unsplash.com", "data:"],
-      connectSrc: ["'self'"], formAction: ["'self'"], baseUri: ["'self'"], frameAncestors: ["'none'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"], imgSrc: ["'self'", "https://images.unsplash.com", "https://res.cloudinary.com", "data:"],
+      connectSrc: ["'self'", "https://api.cloudinary.com"], formAction: ["'self'"], baseUri: ["'self'"], frameAncestors: ["'none'"],
       upgradeInsecureRequests: process.env.NODE_ENV === "production" ? [] : null
     }
   }
@@ -151,11 +185,12 @@ app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
 app.get("/api/catalog", async (_req, res, next) => {
   try {
-    const [catalogBarbers, catalogServices] = await Promise.all([
+    const [catalogBarbers, catalogServices, settings] = await Promise.all([
       db.collection("barbers").find({ active: { $ne: false } }).sort({ _id: 1 }).toArray(),
-      db.collection("services").find({ active: { $ne: false } }).sort({ _id: 1 }).toArray()
+      db.collection("services").find({ active: { $ne: false }, barberId: { $exists: true } }).sort({ barberId: 1, _id: 1 }).toArray(),
+      db.collection("settings").findOne({ _id: "main" })
     ]);
-    res.json({ barbers: catalogBarbers, services: catalogServices, timezone: shopZone, currency: "AZN" });
+    res.json({ barbers: catalogBarbers, services: catalogServices, siteContent: settings.siteContent || defaultSiteContent, timezone: shopZone, currency: "AZN" });
   } catch (error) { next(error); }
 });
 
@@ -167,7 +202,7 @@ app.get("/api/availability", async (req, res, next) => {
     }
     const [barber, service, settings] = await Promise.all([
       db.collection("barbers").findOne({ _id: barberId, active: { $ne: false } }),
-      db.collection("services").findOne({ _id: serviceId, active: { $ne: false } }),
+      db.collection("services").findOne({ _id: serviceId, barberId, active: { $ne: false } }),
       db.collection("settings").findOne({ _id: "main" })
     ]);
     if (!barber || !service || !settings) return res.status(404).json({ error: "Barber or service was not found." });
@@ -207,15 +242,14 @@ app.get("/api/availability", async (req, res, next) => {
 
 app.post("/api/appointments", bookingLimit, async (req, res, next) => {
   try {
-    const { customerName, email, barberId, serviceId, date, time, note = "", language = "az" } = req.body || {};
+    const { customerName, email, barberId, serviceId, date, time, note = "" } = req.body || {};
     const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (typeof customerName !== "string" || customerName.trim().length < 2 || customerName.trim().length > 100) return res.status(400).json({ error: "Enter a valid name." });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || normalizedEmail.length > 254) return res.status(400).json({ error: "Enter a valid email address." });
     if (typeof note !== "string" || note.length > 1000) return res.status(400).json({ error: "The note is too long." });
-    if (!["az", "ru", "en"].includes(language)) return res.status(400).json({ error: "Choose a valid language." });
     const [barber, service] = await Promise.all([
       db.collection("barbers").findOne({ _id: barberId, active: { $ne: false } }),
-      db.collection("services").findOne({ _id: serviceId, active: { $ne: false } })
+      db.collection("services").findOne({ _id: serviceId, barberId, active: { $ne: false } })
     ]);
     if (!barber || !service) return res.status(400).json({ error: "Choose a valid barber and service." });
 
@@ -242,16 +276,15 @@ app.post("/api/appointments", bookingLimit, async (req, res, next) => {
       customerName: customerName.trim(),
       customerEmail: normalizedEmail,
       barberId,
-      barberName: barberName(barber, language),
+      barberName: barberName(barber),
       serviceId,
-      serviceName: serviceName(service, language),
+      serviceName: serviceName(service),
       servicePrice: service.price,
       serviceDurationMinutes: service.durationMinutes,
       date,
       time,
       timezone: shopZone,
       note: note.trim(),
-      language,
       status: "confirmed",
       startAt: startUtc,
       endAt: endUtc,
@@ -314,7 +347,7 @@ app.get("/api/admin/settings", requireAdmin, async (_req, res, next) => {
       db.collection("settings").findOne({ _id: "main" }),
       db.collection("barbers").find({}).sort({ _id: 1 }).toArray()
     ]);
-    res.json({ weeklyHours: settings.weeklyHours, timezone: settings.timezone, barbers: allBarbers });
+    res.json({ weeklyHours: settings.weeklyHours, timezone: settings.timezone, siteContent: settings.siteContent || defaultSiteContent, barbers: allBarbers });
   } catch (error) { next(error); }
 });
 
@@ -337,33 +370,45 @@ app.put("/api/admin/settings/hours", requireAdmin, async (req, res, next) => {
   } catch (error) { next(error); }
 });
 
-function validTranslations(value, maxLength = 100) {
-  return value && typeof value === "object" && ["az", "ru", "en"].every((language) => typeof value[language] === "string" && value[language].trim().length > 0 && value[language].trim().length <= maxLength);
+function validText(value, maxLength = 100) {
+  return typeof value === "string" && value.trim().length > 0 && value.trim().length <= maxLength;
+}
+
+function slugify(value) {
+  const transliterated = value.toLocaleLowerCase("az-AZ").replace(/[əıöüşçğ]/g, (char) => ({ ə: "e", ı: "i", ö: "o", ü: "u", ş: "sh", ç: "ch", ğ: "g" })[char]);
+  return transliterated.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48);
 }
 
 app.post("/api/admin/barbers", requireAdmin, async (req, res, next) => {
   try {
-    const { name, role, photo = "photo-1500648767791-00dcc994a43e" } = req.body || {};
-    if (!validTranslations(name) || !validTranslations(role) || typeof photo !== "string" || photo.length > 160) return res.status(400).json({ error: "Provide a name and role in Azerbaijani, Russian, and English." });
-    const id = name.en.trim().toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48);
-    if (!id) return res.status(400).json({ error: "Enter a valid barber name." });
-    if (await db.collection("barbers").findOne({ _id: id })) return res.status(409).json({ error: "A barber with a similar English name already exists." });
-    await db.collection("barbers").insertOne({ _id: id, name: Object.fromEntries(Object.entries(name).map(([key, value]) => [key, value.trim()])), role: Object.fromEntries(Object.entries(role).map(([key, value]) => [key, value.trim()])), photo: photo.trim() || "photo-1500648767791-00dcc994a43e", active: true, createdAt: new Date() });
+    const { name, role } = req.body || {};
+    if (!validText(name) || !validText(role)) return res.status(400).json({ error: "Bərbərin adını və vəzifəsini düzgün daxil edin." });
+    const baseId = slugify(name);
+    if (!baseId) return res.status(400).json({ error: "Düzgün bərbər adı daxil edin." });
+    let id = baseId;
+    for (let suffix = 2; await db.collection("barbers").findOne({ _id: id }); suffix++) id = `${baseId}-${suffix}`;
+    await db.collection("barbers").insertOne({ _id: id, name: name.trim(), role: role.trim(), photoUrl: barbers[0].photo ? `https://images.unsplash.com/${barbers[0].photo}?auto=format&fit=crop&w=900&q=85` : "", active: true, createdAt: new Date() });
+    for (const service of services) {
+      const barberService = { ...service, _id: `${service._id}-${id}`, barberId: id, active: true };
+      await db.collection("services").updateOne({ _id: barberService._id }, { $setOnInsert: barberService }, { upsert: true });
+    }
     res.status(201).json({ ok: true, id });
   } catch (error) { next(error); }
 });
 
 app.patch("/api/admin/barbers/:id", requireAdmin, async (req, res, next) => {
   try {
-    const { name, role, active, photo } = req.body || {};
+    const { name, role, active } = req.body || {};
     const changes = { updatedAt: new Date() };
     if (name !== undefined) {
-      if (!validTranslations(name)) return res.status(400).json({ error: "Provide a name in Azerbaijani, Russian, and English." });
-      changes.name = Object.fromEntries(Object.entries(name).map(([key, value]) => [key, value.trim()]));
+      if (!validText(name)) return res.status(400).json({ error: "Düzgün bərbər adı daxil edin." });
+      changes.name = name.trim();
+      const baseId = slugify(name);
+      if (baseId !== req.params.id && await db.collection("barbers").findOne({ _id: baseId })) return res.status(409).json({ error: "Bu adda bərbər artıq mövcuddur." });
     }
     if (role !== undefined) {
-      if (!validTranslations(role)) return res.status(400).json({ error: "Provide a role in Azerbaijani, Russian, and English." });
-      changes.role = Object.fromEntries(Object.entries(role).map(([key, value]) => [key, value.trim()]));
+      if (!validText(role)) return res.status(400).json({ error: "Bərbərin vəzifəsini daxil edin." });
+      changes.role = role.trim();
     }
     if (active !== undefined) {
       if (typeof active !== "boolean") return res.status(400).json({ error: "Invalid barber status." });
@@ -374,13 +419,117 @@ app.patch("/api/admin/barbers/:id", requireAdmin, async (req, res, next) => {
       }
       changes.active = active;
     }
-    if (photo !== undefined) {
-      if (typeof photo !== "string" || photo.length > 160) return res.status(400).json({ error: "Invalid barber photo." });
-      changes.photo = photo.trim();
-    }
     const result = await db.collection("barbers").updateOne({ _id: req.params.id }, { $set: changes });
     if (!result.matchedCount) return res.status(404).json({ error: "Barber not found." });
     res.json({ ok: true });
+  } catch (error) { next(error); }
+});
+
+app.get("/api/admin/services", requireAdmin, async (_req, res, next) => {
+  try {
+    const [allBarbers, allServices] = await Promise.all([
+      db.collection("barbers").find({}).sort({ _id: 1 }).toArray(),
+      db.collection("services").find({ barberId: { $exists: true } }).sort({ barberId: 1, name: 1 }).toArray()
+    ]);
+    res.json({ barbers: allBarbers, services: allServices });
+  } catch (error) { next(error); }
+});
+
+app.post("/api/admin/services", requireAdmin, async (req, res, next) => {
+  try {
+    const { barberId, name, description, price, durationMinutes } = req.body || {};
+    const priceValue = Number(price);
+    const durationValue = Number(durationMinutes);
+    if (!validText(name, 100) || typeof description !== "string" || description.trim().length > 240 || !Number.isFinite(priceValue) || priceValue <= 0 || priceValue > 10000 || !Number.isInteger(durationValue) || durationValue < 10 || durationValue > 240) {
+      return res.status(400).json({ error: "Xidmətin adını, qiymətini və müddətini düzgün daxil edin." });
+    }
+    if (!await db.collection("barbers").findOne({ _id: barberId, active: { $ne: false } })) return res.status(400).json({ error: "Aktiv bərbər seçin." });
+    const service = { _id: crypto.randomUUID(), barberId, name: name.trim(), description: description.trim(), price: priceValue, durationMinutes: durationValue, active: true, createdAt: new Date() };
+    await db.collection("services").insertOne(service);
+    res.status(201).json(service);
+  } catch (error) { next(error); }
+});
+
+app.patch("/api/admin/services/:id", requireAdmin, async (req, res, next) => {
+  try {
+    const { name, description, price, durationMinutes, active } = req.body || {};
+    const changes = { updatedAt: new Date() };
+    if (name !== undefined) {
+      if (!validText(name, 100)) return res.status(400).json({ error: "Xidmətin adını daxil edin." });
+      changes.name = name.trim();
+    }
+    if (description !== undefined) {
+      if (typeof description !== "string" || description.trim().length > 240) return res.status(400).json({ error: "Xidmət təsviri çox uzundur." });
+      changes.description = description.trim();
+    }
+    if (price !== undefined) {
+      const value = Number(price);
+      if (!Number.isFinite(value) || value <= 0 || value > 10000) return res.status(400).json({ error: "Düzgün qiymət daxil edin." });
+      changes.price = value;
+    }
+    if (durationMinutes !== undefined) {
+      const value = Number(durationMinutes);
+      if (!Number.isInteger(value) || value < 10 || value > 240) return res.status(400).json({ error: "Müddət 10–240 dəqiqə arasında olmalıdır." });
+      changes.durationMinutes = value;
+    }
+    if (active !== undefined) {
+      if (typeof active !== "boolean") return res.status(400).json({ error: "Xidmət statusu düzgün deyil." });
+      changes.active = active;
+    }
+    const result = await db.collection("services").updateOne({ _id: req.params.id, barberId: { $exists: true } }, { $set: changes });
+    if (!result.matchedCount) return res.status(404).json({ error: "Xidmət tapılmadı." });
+    res.json({ ok: true });
+  } catch (error) { next(error); }
+});
+
+app.put("/api/admin/site-content", requireAdmin, async (req, res, next) => {
+  try {
+    const about = req.body?.about;
+    const fields = ["kicker", "title", "paragraph1", "paragraph2", "note"];
+    const limits = { kicker: 80, title: 120, paragraph1: 500, paragraph2: 500, note: 180 };
+    if (!about || fields.some((field) => !validText(about[field], limits[field]))) return res.status(400).json({ error: "Haqqımızda bölməsinin bütün xanalarını düzgün doldurun." });
+    const cleaned = Object.fromEntries(fields.map((field) => [field, about[field].trim()]));
+    await db.collection("settings").updateOne({ _id: "main" }, { $set: { "siteContent.about": cleaned, updatedAt: new Date() } });
+    res.json({ ok: true, about: cleaned });
+  } catch (error) { next(error); }
+});
+
+function cloudinaryPublicId(type, key) {
+  if (type === "site" && ["hero", "gallery-1", "gallery-2", "gallery-3", "gallery-4"].includes(key)) return `goodcut-site-${key}`;
+  if (type === "barber" && typeof key === "string" && /^[a-z0-9-]{1,64}$/.test(key)) return `goodcut-barber-${key}`;
+  return "";
+}
+
+app.post("/api/admin/images/signature", requireAdmin, async (req, res, next) => {
+  try {
+    const { type, key } = req.body || {};
+    const publicId = cloudinaryPublicId(type, key);
+    if (!publicId || (type === "barber" && !await db.collection("barbers").findOne({ _id: key }))) return res.status(400).json({ error: "Şəkil yeri düzgün deyil." });
+    const { CLOUDINARY_CLOUD_NAME: cloudName, CLOUDINARY_API_KEY: apiKey, CLOUDINARY_API_SECRET: apiSecret } = process.env;
+    if (!cloudName || !apiKey || !apiSecret) return res.status(503).json({ error: "Cloudinary sazlanmayıb. Vercel mühit dəyişənlərini yoxlayın." });
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const params = { overwrite: "true", public_id: publicId, timestamp };
+    const stringToSign = Object.keys(params).sort().map((name) => `${name}=${params[name]}`).join("&") + apiSecret;
+    const signature = crypto.createHash("sha1").update(stringToSign).digest("hex");
+    res.json({ cloudName, apiKey, timestamp, publicId, signature });
+  } catch (error) { next(error); }
+});
+
+app.post("/api/admin/images", requireAdmin, async (req, res, next) => {
+  try {
+    const { type, key, publicId, url } = req.body || {};
+    if (publicId !== cloudinaryPublicId(type, key) || typeof url !== "string" || url.length > 1000) return res.status(400).json({ error: "Şəkil məlumatı düzgün deyil." });
+    let parsed;
+    try { parsed = new URL(url); } catch { return res.status(400).json({ error: "Şəkil ünvanı düzgün deyil." }); }
+    if (parsed.protocol !== "https:" || parsed.hostname !== "res.cloudinary.com") return res.status(400).json({ error: "Şəkil Cloudinary-dən olmalıdır." });
+    if (type === "barber") {
+      const result = await db.collection("barbers").updateOne({ _id: key }, { $set: { photoUrl: url, updatedAt: new Date() } });
+      if (!result.matchedCount) return res.status(404).json({ error: "Bərbər tapılmadı." });
+    } else {
+      const settingsField = key === "hero" ? "siteContent.photos.hero" : `siteContent.photos.gallery.${Number(key.slice(-1)) - 1}`;
+      await db.collection("settings").updateOne({ _id: "main" }, { $set: { [settingsField]: url, updatedAt: new Date() } });
+    }
+    res.json({ ok: true, url });
   } catch (error) { next(error); }
 });
 
@@ -407,7 +556,7 @@ app.get("/api/admin/blocks", requireAdmin, async (_req, res, next) => {
       db.collection("blocks").find({ startAt: { $lt: to }, endAt: { $gt: from } }).sort({ startAt: 1 }).toArray(),
       db.collection("barbers").find({}).toArray()
     ]);
-    const nameById = new Map(allBarbers.map((item) => [item._id, item.name.az]));
+    const nameById = new Map(allBarbers.map((item) => [item._id, typeof item.name === "string" ? item.name : item.name?.az || ""]));
     res.json(rows.map((item) => ({ id: String(item._id), barberId: item.barberId, barberName: item.barberId ? nameById.get(item.barberId) : "Bütün salon", date: dateKey(DateTime.fromJSDate(item.startAt, { zone: "utc" })), startTime: DateTime.fromJSDate(item.startAt, { zone: "utc" }).setZone(shopZone).toFormat("HH:mm"), endTime: DateTime.fromJSDate(item.endAt, { zone: "utc" }).setZone(shopZone).toFormat("HH:mm"), reason: item.reason })));
   } catch (error) { next(error); }
 });
@@ -452,8 +601,9 @@ app.delete("/api/admin/blocks/:id", requireAdmin, async (req, res, next) => {
 
 const publicFiles = {
   "/": "index.html", "/index.html": "index.html", "/styles.css": "styles.css", "/script.js": "script.js",
-  "/admin": "admin.html", "/admin/appointments": "admin.html", "/admin/hours": "admin-hours.html", "/admin/barbers": "admin-barbers.html", "/admin/blocks": "admin-blocks.html",
-  "/admin.css": "admin.css", "/admin-auth.js": "admin-auth.js", "/admin.js": "admin.js", "/admin-hours.js": "admin-hours.js", "/admin-barbers.js": "admin-barbers.js", "/admin-blocks.js": "admin-blocks.js"
+  "/admin": "admin.html", "/admin/appointments": "admin.html", "/admin/hours": "admin-hours.html", "/admin/barbers": "admin-barbers.html", "/admin/blocks": "admin-blocks.html", "/admin/services": "admin-services.html", "/admin/content": "admin-content.html",
+  "/admin.css": "admin.css", "/admin-auth.js": "admin-auth.js", "/admin.js": "admin.js", "/admin-hours.js": "admin-hours.js", "/admin-barbers.js": "admin-barbers.js", "/admin-blocks.js": "admin-blocks.js", "/admin-services.js": "admin-services.js", "/admin-content.js": "admin-content.js",
+  "/admin-services.html": "admin-services.html", "/admin-content.html": "admin-content.html"
 };
 for (const [route, file] of Object.entries(publicFiles)) app.get(route, (_req, res) => res.sendFile(path.join(publicRoot, file)));
 app.use((_req, res) => res.status(404).json({ error: "Not found." }));

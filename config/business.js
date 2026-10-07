@@ -1,20 +1,20 @@
 const barbers = [
   {
     _id: "alex-morgan",
-    name: { az: "Alex Morgan", ru: "Alex Morgan", en: "Alex Morgan" },
-    role: { az: "Təsisçi · Kəsim və fade", ru: "Основатель · Стрижки и фейды", en: "Founder · Cuts & fades" },
+    name: "Alex Morgan",
+    role: "Təsisçi · Kəsim və fade",
     photo: "photo-1500648767791-00dcc994a43e"
   },
   {
     _id: "jordan-lee",
-    name: { az: "Jordan Lee", ru: "Jordan Lee", en: "Jordan Lee" },
-    role: { az: "Bərbər · Saç teksturası üzrə", ru: "Барбер · Текстурные стрижки", en: "Barber · Texture specialist" },
+    name: "Jordan Lee",
+    role: "Bərbər · Saç teksturası üzrə",
     photo: "photo-1506794778202-cad84cf45f1d"
   },
   {
     _id: "sam-rivera",
-    name: { az: "Sam Rivera", ru: "Sam Rivera", en: "Sam Rivera" },
-    role: { az: "Bərbər · Saqqal dizaynı üzrə", ru: "Барбер · Уход за бородой", en: "Barber · Beard detailing" },
+    name: "Sam Rivera",
+    role: "Bərbər · Saqqal dizaynı üzrə",
     photo: "photo-1507003211169-0a1dd7228f2d"
   }
 ];
@@ -22,29 +22,29 @@ const barbers = [
 const services = [
   {
     _id: "signature-cut",
-    name: { az: "İmza saç kəsimi", ru: "Фирменная стрижка", en: "The signature cut" },
-    description: { az: "Sizə yaraşan, səliqəli saç kəsimi.", ru: "Аккуратная стрижка с учётом ваших пожеланий.", en: "A considered cut, finished to suit you." },
+    name: "İmza saç kəsimi",
+    description: "Sizə yaraşan, səliqəli saç kəsimi.",
     price: 38,
     durationMinutes: 45
   },
   {
     _id: "cut-and-beard",
-    name: { az: "Saç və saqqal", ru: "Стрижка и борода", en: "Cut & beard" },
-    description: { az: "Təzə kəsim, dəqiq konturlar və isti dəsmal.", ru: "Свежая стрижка, чёткие контуры и горячее полотенце.", en: "A fresh shape-up, clean lines, hot towel finish." },
+    name: "Saç və saqqal",
+    description: "Təzə kəsim, dəqiq konturlar və isti dəsmal.",
     price: 58,
     durationMinutes: 60
   },
   {
     _id: "beard-sculpt",
-    name: { az: "Saqqal forması", ru: "Моделирование бороды", en: "Beard sculpt" },
-    description: { az: "Saqqalınıza səliqəli forma verək.", ru: "Придадим бороде аккуратную форму.", en: "A little structure goes a long way." },
+    name: "Saqqal forması",
+    description: "Saqqalınıza səliqəli forma verək.",
     price: 30,
     durationMinutes: 30
   },
   {
     _id: "full-reset",
-    name: { az: "Tam qulluq", ru: "Полный уход", en: "The full reset" },
-    description: { az: "Saç və saqqal kəsimi, yuma və rahatlıq.", ru: "Стрижка, борода, мытьё и время для отдыха.", en: "Cut, beard, rinse, and a moment to breathe." },
+    name: "Tam qulluq",
+    description: "Saç və saqqal kəsimi, yuma və rahatlıq.",
     price: 72,
     durationMinutes: 75
   }
