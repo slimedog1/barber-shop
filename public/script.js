@@ -1,12 +1,12 @@
 const copy = {
-    preview:"DİZAYN NÜMAYİŞİ",choose:"Dizayn istiqamətini seçin",navServices:"Xidmətlər",navBarbers:"Bərbərlərimiz",navVisit:"Ünvan",book:"Vaxt təyin et",eyebrow:"MƏHƏLLƏNİZİN YENİ NƏSİL BƏRBƏR SALONU",hero:"Saçınız gözəl.<br><em>Əhvalınız daha da.</em>",heroText:"Səliqəli saç kəsimi, xoş söhbət və özünüzə ayırdığınız bir saat. Necəsinizsə, elə gəlin. Daha yaxşı hiss edərək ayrılın.",bookAppointment:"Görüş təyin edin",explore:"Xidmətlərə baxın",openToday:"BU GÜN AÇIQDIR · 09:00—19:00",yourCity:"ŞƏHƏRİNİZ, MƏHƏLLƏNİZ",photoCaption:"XOŞ İNSANLAR. PEŞƏKAR İŞ.",takeSeat:"Əyləşin<br>bir az dincəlin",since:"ÖZÜNÜZ KİMİ OLACAĞINIZ MƏKAN — 2024-DƏN",intro:"Sadəcə saç kəsimi deyil.<br><em>Özünüzə xoş bir saat.</em>",neighbors:"280-DƏN ÇOX MƏMNUN MÜŞTƏRİ",servicesEyebrow:"YAXŞI XİDMƏTLƏR",servicesTitle:"Sizə uyğun<br><em>olanı seçin.</em>",servicesIntro:"Xidmətləri bərbər və qiymət üzrə müqayisə edin, sonra sizə uyğun görüşü seçin.",serviceNames:["İmza saç kəsimi","Saç və saqqal","Saqqal forması","Tam qulluq"],serviceDescriptions:["Sizə yaraşan, səliqəli saç kəsimi.","Təzə kəsim, dəqiq konturlar və isti dəsmal.","Saqqalınıza səliqəli forma verək.","Saç və saqqal kəsimi, yuma və rahatlıq."],consult:"Hər görüşə qısa məsləhətləşmə və ikram daxildir.",bookService:"Xidmət sifariş edin",teamEyebrow:"USTALARIMIZLA TANIŞ OLUN",teamTitle:"Xoş insanlar.<br><em>Etibarlı əllər.</em>",teamIntro:"Söhbətcil, işində dəqiq. Ustalarımızla tanış olun və özünüzə uyğununu seçin.",roles:["Təsisçi · Kəsim və fade","Bərbər · Saç teksturası üzrə","Bərbər · Saqqal dizaynı üzrə"],quote:"“İllərdir etdirdiyim ən yaxşı saç kəsimidir.<br>Qəhvələri də əladır.”",regular:"— TAYLOR R. · 2022-DƏN DAİMİ MÜŞTƏRİ",galleryEyebrow:"SALONUMUZDAN GÖRÜNTÜLƏR",galleryTitle:"Good Cut-da<br><em>gözəl günlər.</em>",comeSee:"Özünüz gəlib görün",visitEyebrow:"GƏLİN, RAHAT ƏYLƏŞİN",visitTitle:"Sizin üçün<br><em>yerimiz var.</em>",visitText:"Boş yer olduqda növbəsiz də qəbul edirik. Görüş təyin etsəniz, sizi gözləyəcəyik.",findTime:"Vaxt seçin",findUs:"ÜNVAN",comeIn:"İŞ SAATLARI",address:"123 Placeholder küçəsi<br>Məhəlləniz, şəhər",hours:"Ç.a.—Cümə · 09:00—19:00<br>Şənbə · 10:00—17:00",map:"GOOD CUT · ŞƏHƏRİNİZ",footerLine:"GÖZƏL KƏSİM. XOŞ İNSANLAR. YAXŞI ƏHVAL.",bookingEyebrow:"BUYURUN, GƏLİN",bookingTitle:"Gəlin,<br><em>özünüzə vaxt ayırın.</em>",bookingIntro:"Nə istədiyinizi yazın. Görüş vaxtını sizinlə dəqiqləşdirəcəyik.",name:"Adınız",namePlaceholder:"Sizə necə müraciət edək?",contact:"E-poçt ünvanı",contactPlaceholder:"name@example.com",service:"Xidmət",selectService:"Xidmət seçin",date:"Uyğun gün",note:"Əlavə qeyd",optional:"İSTƏYƏ BAĞLI",notePlaceholder:"Bərbəriniz üçün qeyd",request:"Görüş üçün müraciət edin",demo:"Təsdiq e-poçtla göndəriləcək.",successEyebrow:"ƏLA!",successTitle:"Görüşünüz<br><em>təsdiqləndi.</em>",successText:"Təsdiq məlumatını e-poçt ünvanınıza göndərdik.",back:"Salona qayıt",close:"Formanı bağla",barberBook:"usta ilə görüş təyin edin"
+    preview:"DİZAYN NÜMAYİŞİ",choose:"Dizayn istiqamətini seçin",navServices:"Xidmətlər",navBarbers:"Bərbərlərimiz",navVisit:"Ünvan",book:"Vaxt təyin et",eyebrow:"MƏHƏLLƏNİZİN YENİ NƏSİL BƏRBƏR SALONU",hero:"Saçınız gözəl.<br><em>Əhvalınız daha da.</em>",heroText:"Səliqəli saç kəsimi, xoş söhbət və özünüzə ayırdığınız bir saat. Necəsinizsə, elə gəlin. Daha yaxşı hiss edərək ayrılın.",bookAppointment:"Görüş təyin edin",explore:"Xidmətlərə baxın",openToday:"BU GÜN AÇIQDIR · 09:00—19:00",yourCity:"ŞƏHƏRİNİZ, MƏHƏLLƏNİZ",photoCaption:"XOŞ İNSANLAR. PEŞƏKAR İŞ.",takeSeat:"Əyləşin<br>bir az dincəlin",since:"ÖZÜNÜZ KİMİ OLACAĞINIZ MƏKAN — 2024-DƏN",intro:"Sadəcə saç kəsimi deyil.<br><em>Özünüzə xoş bir saat.</em>",neighbors:"280-DƏN ÇOX MƏMNUN MÜŞTƏRİ",servicesEyebrow:"YAXŞI XİDMƏTLƏR",servicesTitle:"Sizə uyğun<br><em>olanı seçin.</em>",servicesIntro:"Xidmətləri bərbər və qiymət üzrə müqayisə edin, sonra sizə uyğun görüşü seçin.",serviceNames:["İmza saç kəsimi","Saç və saqqal","Saqqal forması","Tam qulluq"],serviceDescriptions:["Sizə yaraşan, səliqəli saç kəsimi.","Təzə kəsim, dəqiq konturlar və isti dəsmal.","Saqqalınıza səliqəli forma verək.","Saç və saqqal kəsimi, yuma və rahatlıq."],consult:"Hər görüşə qısa məsləhətləşmə və ikram daxildir.",bookService:"Xidmət sifariş edin",teamEyebrow:"USTALARIMIZLA TANIŞ OLUN",teamTitle:"Xoş insanlar.<br><em>Etibarlı əllər.</em>",teamIntro:"Söhbətcil, işində dəqiq. Ustalarımızla tanış olun və özünüzə uyğununu seçin.",roles:["Təsisçi · Kəsim və fade","Bərbər · Saç teksturası üzrə","Bərbər · Saqqal dizaynı üzrə"],quote:"“İllərdir etdirdiyim ən yaxşı saç kəsimidir.<br>Qəhvələri də əladır.”",regular:"— TAYLOR R. · 2022-DƏN DAİMİ MÜŞTƏRİ",galleryEyebrow:"SALONUMUZDAN GÖRÜNTÜLƏR",galleryTitle:"Good Cut-da<br><em>gözəl günlər.</em>",comeSee:"Özünüz gəlib görün",visitEyebrow:"GƏLİN, RAHAT ƏYLƏŞİN",visitTitle:"Sizin üçün<br><em>yerimiz var.</em>",visitText:"Boş yer olduqda növbəsiz də qəbul edirik. Görüş təyin etsəniz, sizi gözləyəcəyik.",findTime:"Vaxt seçin",findUs:"ÜNVAN",comeIn:"İŞ SAATLARI",address:"123 Placeholder küçəsi<br>Məhəlləniz, şəhər",hours:"Ç.a.—Cümə · 09:00—19:00<br>Şənbə · 10:00—17:00",map:"GOOD CUT · ŞƏHƏRİNİZ",footerLine:"GÖZƏL KƏSİM. XOŞ İNSANLAR. YAXŞI ƏHVAL.",bookingEyebrow:"BUYURUN, GƏLİN",bookingTitle:"Gəlin,<br><em>özünüzə vaxt ayırın.</em>",bookingIntro:"Nə istədiyinizi yazın. Görüş vaxtını sizinlə dəqiqləşdirəcəyik.",name:"Adınız",namePlaceholder:"Sizə necə müraciət edək?",contact:"E-poçt ünvanı",contactPlaceholder:"name@example.com",service:"Xidmət",selectService:"Xidmət seçin",date:"Uyğun gün",note:"Əlavə qeyd",optional:"İSTƏYƏ BAĞLI",notePlaceholder:"Bərbəriniz üçün qeyd",request:"Görüş üçün müraciət edin",demo:"E-poçt ünvanınız görüşlə bağlı lazım olduqda əlaqə üçün saxlanılır.",successEyebrow:"ƏLA!",successTitle:"Görüşünüz<br><em>təsdiqləndi.</em>",successText:"Görüşünüz dərhal təsdiqləndi. Lazım olduqda salon sizinlə əlaqə saxlayacaq.",back:"Salona qayıt",close:"Formanı bağla",barberBook:"usta ilə görüş təyin edin"
 };
 
 const calendarCopy = { barberLabel:"Bərbər seçin", pickBarber:"Bərbər seçin", calendarTitle:"Görüş günü", availabilityNote:"Mövcud vaxtlar", chooseBarberFirst:"Boş vaxtları görmək üçün əvvəlcə bərbər seçin.", chooseDay:"Mövcud saatları görmək üçün günü seçin.", chooseService:"Əvvəlcə xidmət seçin.", loading:"Boş vaxtlar yüklənir…", loadError:"Boş vaxtları yükləmək mümkün olmadı. Yenidən yoxlayın.", available:"boş vaxt", availablePlural:"boş vaxt", chooseTime:"Saat seçin", none:"Bu gün üçün boş saat qalmayıb.", missing:"Zəhmət olmasa bərbər, xidmət, gün və saat seçin.", prev:"Əvvəlki ay", next:"Növbəti ay", weekdays:["B.e","Ç.a","Çər","C.a","Cüm","Şən","Baz"] };
 
 const themeLabels = { light: "İşıqlı rejim", dark: "Tünd rejim", switchLight: "İşıqlı rejimə keç", switchDark: "Tünd rejimə keç" };
 
-const bookingMessages = { unavailable:"Bu vaxt yenicə tutulub. Başqa vaxt seçin.", failed:"Görüşü təsdiqləmək mümkün olmadı. Yenidən cəhd edin.", emailSent:"Təsdiq məktubunu e-poçtunuza göndərdik.", emailFailed:"Görüş təsdiqləndi, amma e-poçt göndərilmədi. Salonla əlaqə saxlayın.", sending:"Göndərilir…" };
+const bookingMessages = { unavailable:"Bu vaxt yenicə tutulub. Başqa vaxt seçin.", failed:"Görüşü təsdiqləmək mümkün olmadı. Yenidən cəhd edin.", confirmed:"Görüşünüz dərhal təsdiqləndi. Lazım olduqda salon sizinlə əlaqə saxlayacaq.", sending:"Təsdiqlənir…" };
 
 let galleryPhotos = [];
 let catalog = { barbers: [], services: [] };
@@ -18,11 +18,35 @@ let availabilityError = "";
 let theme = "dark";
 try { theme = localStorage.getItem("good-cut-theme") || "dark"; } catch {}
 if (theme !== "light" && theme !== "dark") theme = "dark";
-const now = new Date();
-const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+let shopTimezone = "Asia/Baku";
+
+function dateTodayInShopTimezone(timeZone) {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date()).map((part) => [part.type, part.value]));
+  return new Date(Number(parts.year), Number(parts.month) - 1, Number(parts.day));
+}
+
+let today = dateTodayInShopTimezone(shopTimezone);
 let calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+let firstBookableMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+let lastBookableMonth = new Date(today.getFullYear(), today.getMonth() + 11, 1);
 let selectedDate = "";
 let selectedTime = "";
+
+function setCalendarTimezone(timeZone) {
+  try {
+    const nextToday = dateTodayInShopTimezone(timeZone);
+    shopTimezone = timeZone;
+    today = nextToday;
+    firstBookableMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    lastBookableMonth = new Date(today.getFullYear(), today.getMonth() + 11, 1);
+    calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  } catch {}
+}
 
 function dateKey(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -39,7 +63,11 @@ function drawCalendar() {
   const serviceId = document.querySelector("#booking-service").value;
   const monthLabel = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(calendarMonth);
   document.querySelector("#calendar-month-label").textContent = monthLabel;
-  document.querySelector("#calendar-prev").disabled = calendarMonth.getFullYear() === today.getFullYear() && calendarMonth.getMonth() <= today.getMonth();
+  const displayedMonthIndex = calendarMonth.getFullYear() * 12 + calendarMonth.getMonth();
+  const firstBookableMonthIndex = firstBookableMonth.getFullYear() * 12 + firstBookableMonth.getMonth();
+  const lastBookableMonthIndex = lastBookableMonth.getFullYear() * 12 + lastBookableMonth.getMonth();
+  document.querySelector("#calendar-prev").disabled = displayedMonthIndex <= firstBookableMonthIndex;
+  document.querySelector("#calendar-next").disabled = displayedMonthIndex >= lastBookableMonthIndex;
   document.querySelector("#calendar-prev").setAttribute("aria-label", words.prev);
   document.querySelector("#calendar-next").setAttribute("aria-label", words.next);
   document.querySelector("#calendar-weekdays").innerHTML = words.weekdays.map((day) => `<span>${day}</span>`).join("");
@@ -191,6 +219,7 @@ async function loadCatalog() {
     const response = await fetch("/api/catalog");
     if (!response.ok) throw new Error("Xidmət siyahısını yükləmək mümkün olmadı.");
     catalog = await response.json();
+    setCalendarTimezone(catalog.timezone || shopTimezone);
     renderServices();
     renderBarbers();
     renderAbout();
@@ -369,7 +398,6 @@ document.querySelector("#booking-form").addEventListener("submit", async (event)
         date: selectedDate, time: selectedTime, note: fields.get("note")
       })
     });
-    const result = await response.json();
     if (!response.ok) {
       const errorText = response.status === 409 ? bookingMessages.unavailable : bookingMessages.failed;
       if (response.status === 409) resetCalendarSelection();
@@ -379,7 +407,7 @@ document.querySelector("#booking-form").addEventListener("submit", async (event)
     }
     document.querySelector("#booking-form-wrap").hidden = true;
     document.querySelector("#booking-success").hidden = false;
-    document.querySelector("#booking-success-message").textContent = result.emailSent ? bookingMessages.emailSent : bookingMessages.emailFailed;
+    document.querySelector("#booking-success-message").textContent = bookingMessages.confirmed;
   } catch {
     message.textContent = bookingMessages.failed;
     message.hidden = false;

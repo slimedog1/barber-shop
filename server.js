@@ -7,7 +7,6 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const { MongoClient, ObjectId } = require("mongodb");
 const { DateTime } = require("luxon");
-const nodemailer = require("nodemailer");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
 const { barbers, services, business } = require("./config/business");
@@ -36,7 +35,6 @@ const defaultSiteContent = {
 
 const client = new MongoClient(mongoUrl, { serverSelectionTimeoutMS: 5000 });
 let db;
-let mailer;
 let appReady;
 
 function localDateTime(date, time, zone = shopZone) {
@@ -47,6 +45,11 @@ function localDateTime(date, time, zone = shopZone) {
 
 function dateKey(value) {
   return value.setZone(shopZone).toFormat("yyyy-MM-dd");
+}
+
+function isWithinBookingHorizon(value) {
+  const currentMonth = DateTime.now().setZone(shopZone).startOf("month");
+  return value >= currentMonth && value < currentMonth.plus({ months: 12 });
 }
 
 function overlaps(startA, endA, startB, endB) {
@@ -69,10 +72,85 @@ function safeEquals(left, right) {
   return crypto.timingSafeEqual(a, b);
 }
 
-function localLabel(date) {
-  const local = DateTime.fromJSDate(date, { zone: "utc" }).setZone(shopZone);
-  const dateLabel = new Intl.DateTimeFormat("az-AZ", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: shopZone }).format(local.toJSDate());
-  return { date: dateLabel, time: local.toFormat("HH:mm") };
+// Keep limits shared across serverless instances; HMAC keys and TTL avoid storing raw client IPs indefinitely.
+class MongoRateLimitStore {
+  constructor(collectionName) {
+    this.collectionName = collectionName;
+    this.localKeys = false;
+    this.windowMs = 15 * 60 * 1000;
+    this.indexPromise = null;
+  }
+
+  init(options) {
+    this.windowMs = options.windowMs;
+  }
+
+  get collection() {
+    return db.collection(this.collectionName);
+  }
+
+  storageKey(key) {
+    return crypto.createHmac("sha256", process.env.SESSION_SECRET).update(key).digest("hex");
+  }
+
+  async ensureExpiryIndex() {
+    if (!this.indexPromise) {
+      this.indexPromise = this.collection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 }).catch((error) => {
+        this.indexPromise = null;
+        throw error;
+      });
+    }
+    await this.indexPromise;
+  }
+
+  async increment(key) {
+    await this.ensureExpiryIndex();
+    const id = this.storageKey(key);
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + this.windowMs);
+    const active = await this.collection.findOneAndUpdate(
+      { _id: id, expiresAt: { $gt: now } },
+      { $inc: { totalHits: 1 } },
+      { returnDocument: "after", includeResultMetadata: false }
+    );
+    if (active) return { totalHits: active.totalHits, resetTime: active.expiresAt };
+
+    await this.collection.updateOne(
+      { _id: id, expiresAt: { $lte: now } },
+      { $set: { totalHits: 0, expiresAt } }
+    );
+    try {
+      await this.collection.updateOne(
+        { _id: id },
+        { $setOnInsert: { totalHits: 0, expiresAt } },
+        { upsert: true }
+      );
+    } catch (error) {
+      if (error.code !== 11000) throw error;
+    }
+
+    const result = await this.collection.findOneAndUpdate(
+      { _id: id, expiresAt: { $gt: now } },
+      { $inc: { totalHits: 1 } },
+      { returnDocument: "after", includeResultMetadata: false }
+    );
+    if (!result) throw new Error("Could not update the shared rate-limit counter.");
+    return { totalHits: result.totalHits, resetTime: result.expiresAt };
+  }
+
+  async decrement(key) {
+    const id = this.storageKey(key);
+    await this.collection.updateOne({ _id: id, totalHits: { $gt: 0 } }, { $inc: { totalHits: -1 } });
+  }
+
+  async resetKey(key) {
+    const id = this.storageKey(key);
+    await this.collection.deleteOne({ _id: id });
+  }
+
+  async resetAll() {
+    await this.collection.deleteMany({});
+  }
 }
 
 function serviceName(service) { return typeof service?.name === "string" ? service.name : service?.name?.az || ""; }
@@ -115,31 +193,6 @@ async function seedBusiness() {
   await db.collection("blocks").createIndex({ barberId: 1, startAt: 1, endAt: 1 });
 }
 
-function sendMail(to, subject, text) {
-  if (!mailer || !process.env.EMAIL_FROM || !to) return Promise.resolve(false);
-  return mailer.sendMail({ from: process.env.EMAIL_FROM, to, subject, text })
-    .then(() => true)
-    .catch((error) => { console.error("Email notification failed:", error.message); return false; });
-}
-
-async function sendAppointmentMail(appointment, canceled = false) {
-  const t = { bookedSubject: "Görüşünüz təsdiqləndi · Good Cut", booked: "Salam {name}, görüşünüz təsdiqləndi.", canceledSubject: "Görüşünüz ləğv edildi · Good Cut", canceled: "Salam {name}, görüşünüz ləğv edildi.", details: "Xidmət: {service}\nBərbər: {barber}\nTarix və saat: {date} · {time}", reason: "Qeyd: {reason}", footer: "Good Cut bərbər studiyası · {timezone}" };
-  const service = await db.collection("services").findOne({ _id: appointment.serviceId });
-  const barber = await db.collection("barbers").findOne({ _id: appointment.barberId });
-  const local = localLabel(appointment.startAt);
-  const interpolate = (line) => line.replace("{name}", appointment.customerName)
-    .replace("{service}", serviceName(service))
-    .replace("{barber}", barberName(barber))
-    .replace("{date}", local.date)
-    .replace("{time}", local.time)
-    .replace("{reason}", appointment.cancellationReason || "")
-    .replace("{timezone}", shopZone);
-  const intro = interpolate(canceled ? t.canceled : t.booked);
-  const detailLines = interpolate(t.details);
-  const reason = canceled && appointment.cancellationReason ? `\n${interpolate(t.reason)}` : "";
-  return sendMail(appointment.customerEmail, canceled ? t.canceledSubject : t.bookedSubject, `${intro}\n\n${detailLines}${reason}\n\n${interpolate(t.footer)}`);
-}
-
 function requireAdmin(req, res, next) {
   if (req.session?.admin) return next();
   return res.status(401).json({ error: "Authentication required." });
@@ -171,15 +224,16 @@ app.use((_req, _res, next) => {
 });
 app.use(session({
   name: "goodcut.sid",
-  secret: process.env.SESSION_SECRET || "missing-secret-set-this-in-env-before-starting",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({ mongoUrl, dbName, collectionName: "sessions", ttl: 60 * 60 * 8 }),
   cookie: { httpOnly: true, sameSite: "strict", secure: process.env.NODE_ENV === "production", maxAge: 8 * 60 * 60 * 1000 }
 }));
 
-const bookingLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: "draft-8", legacyHeaders: false });
-const loginLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: "draft-8", legacyHeaders: false });
+const bookingLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, store: new MongoRateLimitStore("rate_limits_bookings"), standardHeaders: "draft-8", legacyHeaders: false });
+const loginLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, store: new MongoRateLimitStore("rate_limits_logins"), standardHeaders: "draft-8", legacyHeaders: false });
+const availabilityLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 60, store: new MongoRateLimitStore("rate_limits_availability"), standardHeaders: "draft-8", legacyHeaders: false });
 
 app.get("/api/health", (_req, res) => res.json({ ok: true }));
 
@@ -194,7 +248,7 @@ app.get("/api/catalog", async (_req, res, next) => {
   } catch (error) { next(error); }
 });
 
-app.get("/api/availability", async (req, res, next) => {
+app.get("/api/availability", availabilityLimit, async (req, res, next) => {
   try {
     const { barberId, serviceId, month } = req.query;
     if (typeof barberId !== "string" || typeof serviceId !== "string" || typeof month !== "string" || !/^\d{4}-\d{2}$/.test(month)) {
@@ -209,6 +263,7 @@ app.get("/api/availability", async (req, res, next) => {
 
     const first = DateTime.fromFormat(`${month}-01`, "yyyy-MM-dd", { zone: shopZone });
     if (!first.isValid || first.toFormat("yyyy-MM") !== month) return res.status(400).json({ error: "Invalid calendar month." });
+    if (!isWithinBookingHorizon(first)) return res.status(400).json({ error: "Choose a month within the next 12 months." });
     const monthEnd = first.plus({ months: 1 });
     const monthStartDate = first.startOf("day").toJSDate();
     const monthEndDate = monthEnd.startOf("day").toJSDate();
@@ -255,12 +310,16 @@ app.post("/api/appointments", bookingLimit, async (req, res, next) => {
 
     const start = localDateTime(date, time);
     if (!start || start <= DateTime.now().setZone(shopZone)) return res.status(400).json({ error: "Choose a future time." });
+    if (!isWithinBookingHorizon(start)) return res.status(400).json({ error: "Choose a time within the next 12 months." });
     const settings = await db.collection("settings").findOne({ _id: "main" });
     const hours = settings.weeklyHours[String(start.weekday % 7)];
+    const opening = hours && localDateTime(date, hours.open);
+    const closing = hours && localDateTime(date, hours.close);
     const blockMinutes = reservedMinutes(service.durationMinutes);
     const end = start.plus({ minutes: service.durationMinutes });
     const reservedEnd = start.plus({ minutes: blockMinutes });
-    if (!hours || start.toFormat("HH:mm") < hours.open || reservedEnd.toFormat("HH:mm") > hours.close) return res.status(409).json({ error: "That time is outside the shop schedule." });
+    // Compare complete local date-times so a reservation ending after midnight cannot wrap past closing.
+    if (!opening || !closing || start < opening || reservedEnd > closing) return res.status(409).json({ error: "That time is outside the shop schedule." });
 
     const startUtc = start.toUTC().toJSDate();
     const endUtc = end.toUTC().toJSDate();
@@ -300,8 +359,7 @@ app.post("/api/appointments", bookingLimit, async (req, res, next) => {
       { $set: { name: appointment.customerName, email: normalizedEmail, lastSeenAt: new Date() }, $setOnInsert: { createdAt: new Date() }, $inc: { appointmentCount: 1 } },
       { upsert: true }
     );
-    const emailSent = await sendAppointmentMail(appointment);
-    res.status(201).json({ id: String(appointment._id), status: "confirmed", emailSent, date, time });
+    res.status(201).json({ id: String(appointment._id), status: "confirmed", date, time });
   } catch (error) {
     if (error.code === 11000) return res.status(409).json({ error: "That slot was just taken. Please choose another time." });
     next(error);
@@ -543,8 +601,7 @@ app.patch("/api/admin/appointments/:id/cancel", requireAdmin, async (req, res, n
       { returnDocument: "after" }
     );
     if (!appointment) return res.status(409).json({ error: "The appointment could not be canceled. It may have already started or been canceled." });
-    const emailSent = await sendAppointmentMail(appointment, true);
-    res.json({ ok: true, emailSent });
+    res.json({ ok: true });
   } catch (error) { next(error); }
 });
 
@@ -620,11 +677,6 @@ async function initialize() {
   await client.connect();
   db = client.db(dbName);
   await seedBusiness();
-  if (process.env.SMTP_HOST && process.env.EMAIL_FROM) {
-    mailer = nodemailer.createTransport({ host: process.env.SMTP_HOST, port: Number(process.env.SMTP_PORT || 587), secure: process.env.SMTP_SECURE === "true", auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD } : undefined });
-  } else {
-    console.warn("Email is not configured. Bookings will save, but notification emails will not be sent.");
-  }
 }
 
 appReady = initialize();

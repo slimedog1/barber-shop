@@ -26,9 +26,9 @@ The admin photo pickers upload images directly from a phone or computer to Cloud
 3. Add the same three variables to the Vercel project's Environment Variables, then redeploy. Keep the API secret private.
 4. Open `/admin/barbers` to replace profile photos, or `/admin/content` to replace the homepage and gallery photos. The picker supports images up to 10 MB.
 
-## Email notifications (optional for now)
+## Customer contact
 
-Appointments are saved and confirmed even while SMTP settings are blank. Add your email provider's SMTP host, port, username, password, and sender address to `.env` to send booking and cancellation notices.
+Customers provide an email address with each booking. It is saved with the appointment so staff can contact the customer from the appointments page. The app does not send email notifications.
 
 ## Editable shop placeholders
 

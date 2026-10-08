@@ -53,7 +53,7 @@ document.querySelector("#date-today").addEventListener("click", () => { document
 
 document.addEventListener("click", async (event) => {
   const cancel = event.target.closest("[data-cancel-appointment]");
-  if (!cancel || !window.confirm("Bu görüşü ləğv etmək istəyirsiniz? Müştəriyə e-poçt bildirişi göndərilə bilər.")) return;
+  if (!cancel || !window.confirm("Bu görüşü ləğv etmək istəyirsiniz? Ləğv səbəbi müştəri qeydlərində saxlanılacaq.")) return;
   const reason = window.prompt("Müştəri üçün ləğv qeydi (istəyə bağlı):", "") || "";
   try {
     await Admin.api(`/api/admin/appointments/${encodeURIComponent(cancel.dataset.cancelAppointment)}/cancel`, { method: "PATCH", body: JSON.stringify({ reason }) });
